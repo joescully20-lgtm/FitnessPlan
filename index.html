@@ -1369,6 +1369,7 @@ function showTab(id, el) {
   document.getElementById(id).classList.add('active');
   el.classList.add('active');
   if (id === 'log') renderLog();
+  if (id === 'habits') renderHabits();
 }
 
 function toggleDay(id) {
@@ -1743,7 +1744,7 @@ const HABIT_DEFS = [
   { id: 'h4', name: '💪 Complete scheduled workout', why: 'Strength training drives fat loss at 44 better than cardio' },
   { id: 'h5', name: '😴 7–8 hours of sleep', why: 'Poor sleep spikes hunger hormones (ghrelin) by up to 30%' },
   { id: 'h6', name: '🧘 5-min stress check-in', why: 'Cortisol = belly fat storage. Manage stress, manage weight.' },
-  { id: 'h7', name: '📋 Log what you ate today', why: 'People who track food lose 2x more weight than those who don't' },
+  { id: 'h7', name: '📋 Log what you ate today', why: "People who track food lose 2x more weight than those who don't" },
 ];
 
 const DAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -1907,7 +1908,6 @@ function renderHabitHistory(data, currentKey) {
 // Set today's date default on load
 window.addEventListener('load', () => {
   document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
-  renderHabits();
 });
 </script>
 </body>
