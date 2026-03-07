@@ -1375,13 +1375,13 @@
       <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:12px; align-items:end;">
         <div class="log-field">
           <label>Date</label>
-          <input type="date" id="weight-date" style="pointer-events:all;position:relative;z-index:2;">
+          <input type="date" id="weight-date">
         </div>
         <div class="log-field">
           <label>Weight (lbs)</label>
-          <input type="number" id="weight-input" placeholder="e.g. 248.5" min="50" max="500" step="0.1" style="pointer-events:all;position:relative;z-index:2;-webkit-user-select:text;user-select:text;">
+          <input type="number" id="weight-input" placeholder="e.g. 248.5" min="50" max="500" step="0.1">
         </div>
-        <button class="btn-log" onclick="saveWeight()">Save</button>
+        <button id="weight-save-btn" class="btn-log">Save</button>
       </div>
       <div id="weight-save-msg" style="display:none; margin-top:12px; font-family:'DM Mono',monospace; font-size:11px; color:var(--green); letter-spacing:.06em;">✓ SAVED</div>
     </div>
@@ -2005,6 +2005,28 @@ function initWeightTab() {
   if (dateEl && !dateEl.value) {
     dateEl.value = new Date().toISOString().split('T')[0];
   }
+
+  // Attach save button listener fresh each time tab opens
+  const saveBtn = document.getElementById('weight-save-btn');
+  if (saveBtn) {
+    // Clone to remove any stale listeners
+    const newBtn = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newBtn, saveBtn);
+    newBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      saveWeight();
+    });
+  }
+
+  // Also allow Enter key on weight input
+  const weightEl = document.getElementById('weight-input');
+  if (weightEl) {
+    weightEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); saveWeight(); }
+    });
+  }
+
   renderWeightTab();
 }
 
