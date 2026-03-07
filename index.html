@@ -1450,7 +1450,7 @@ function showTab(id, el) {
   el.classList.add('active');
   if (id === 'log') renderLog();
   if (id === 'habits') renderHabits();
-  if (id === 'weight') initWeightTab();
+  if (id === 'weight') renderWeightTab();
 }
 
 function toggleDay(id) {
@@ -1988,7 +1988,48 @@ function renderHabitHistory(data, currentKey) {
 
 // Set today's date default on load
 window.addEventListener('load', () => {
-  document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+  // Set workout log date
+  const logDate = document.getElementById('log-date');
+  if (logDate) logDate.value = new Date().toISOString().split('T')[0];
+
+  // Set weight log date
+  const weightDate = document.getElementById('weight-date');
+  if (weightDate) weightDate.value = new Date().toISOString().split('T')[0];
+
+  // Wire up weight save button immediately — never rely on tab clicks for this
+  const weightBtn = document.getElementById('weight-save-btn');
+  if (weightBtn) {
+    weightBtn.addEventListener('click', function() {
+      const dateVal = document.getElementById('weight-date').value;
+      const weightVal = parseFloat(document.getElementById('weight-input').value);
+      if (!dateVal) { alert('Please select a date.'); return; }
+      if (!weightVal || isNaN(weightVal) || weightVal < 50 || weightVal > 500) {
+        alert('Please enter a valid weight between 50 and 500 lbs.'); return;
+      }
+      const log = loadWeightLog();
+      const idx = log.findIndex(e => e.date === dateVal);
+      if (idx >= 0) log.splice(idx, 1);
+      log.push({ date: dateVal, weight: weightVal });
+      log.sort((a, b) => a.date.localeCompare(b.date));
+      saveWeightLog(log);
+      document.getElementById('weight-input').value = '';
+      // Flash confirmation
+      const banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--green);color:#000;font-family:monospace;font-size:12px;padding:12px 20px;z-index:9999;letter-spacing:.06em;';
+      banner.textContent = '✓ WEIGHT SAVED';
+      document.body.appendChild(banner);
+      setTimeout(() => banner.remove(), 2500);
+      renderWeightTab();
+    });
+  }
+
+  // Enter key on weight input
+  const weightInput = document.getElementById('weight-input');
+  if (weightInput) {
+    weightInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('weight-save-btn').click();
+    });
+  }
 });
 
 // ===== WEIGHT LOG =====
@@ -2000,33 +2041,6 @@ function saveWeightLog(log) {
 }
 
 function initWeightTab() {
-  // Set today as default date
-  const dateEl = document.getElementById('weight-date');
-  if (dateEl && !dateEl.value) {
-    dateEl.value = new Date().toISOString().split('T')[0];
-  }
-
-  // Attach save button listener fresh each time tab opens
-  const saveBtn = document.getElementById('weight-save-btn');
-  if (saveBtn) {
-    // Clone to remove any stale listeners
-    const newBtn = saveBtn.cloneNode(true);
-    saveBtn.parentNode.replaceChild(newBtn, saveBtn);
-    newBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      saveWeight();
-    });
-  }
-
-  // Also allow Enter key on weight input
-  const weightEl = document.getElementById('weight-input');
-  if (weightEl) {
-    weightEl.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); saveWeight(); }
-    });
-  }
-
   renderWeightTab();
 }
 
