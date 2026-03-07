@@ -502,6 +502,12 @@
     padding: 10px 14px;
     outline: none;
     transition: border-color 0.2s;
+    pointer-events: all;
+    position: relative;
+    z-index: 1;
+  }
+
+  .log-field select {
     -webkit-appearance: none;
   }
 
@@ -1369,11 +1375,11 @@
       <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:12px; align-items:end;">
         <div class="log-field">
           <label>Date</label>
-          <input type="date" id="weight-date">
+          <input type="date" id="weight-date" style="pointer-events:all;position:relative;z-index:2;">
         </div>
         <div class="log-field">
           <label>Weight (lbs)</label>
-          <input type="number" id="weight-input" placeholder="e.g. 248.5" min="50" max="500" step="0.1">
+          <input type="number" id="weight-input" placeholder="e.g. 248.5" min="50" max="500" step="0.1" style="pointer-events:all;position:relative;z-index:2;-webkit-user-select:text;user-select:text;">
         </div>
         <button class="btn-log" onclick="saveWeight()">Save</button>
       </div>
