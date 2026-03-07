@@ -2009,27 +2009,38 @@ function initWeightTab() {
 }
 
 function saveWeight() {
-  const date = document.getElementById('weight-date').value;
-  const weight = parseFloat(document.getElementById('weight-input').value);
+  const dateEl = document.getElementById('weight-date');
+  const weightEl = document.getElementById('weight-input');
+  const date = dateEl ? dateEl.value : '';
+  const weight = weightEl ? parseFloat(weightEl.value) : NaN;
 
   if (!date) { alert('Please enter a date.'); return; }
-  if (!weight || weight < 50 || weight > 500) { alert('Please enter a valid weight.'); return; }
+  if (!weight || isNaN(weight) || weight < 50 || weight > 500) { alert('Please enter a valid weight (between 50 and 500 lbs).'); return; }
 
   const log = loadWeightLog();
-  // Remove existing entry for same date if any
   const idx = log.findIndex(e => e.date === date);
   if (idx >= 0) log.splice(idx, 1);
   log.push({ date, weight });
   log.sort((a, b) => a.date.localeCompare(b.date));
   saveWeightLog(log);
 
-  // Clear input, show confirmation
-  document.getElementById('weight-input').value = '';
-  const msg = document.getElementById('weight-save-msg');
-  msg.style.display = 'block';
-  setTimeout(() => msg.style.display = 'none', 2000);
+  // Clear weight input but preserve the date for convenience
+  if (weightEl) weightEl.value = '';
+
+  // Show confirmation banner
+  const banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--green);color:#000;font-family:"DM Mono",monospace;font-size:12px;padding:12px 20px;z-index:9999;letter-spacing:.06em;';
+  banner.textContent = '✓ WEIGHT SAVED';
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 2500);
 
   renderWeightTab();
+
+  // Restore date after render (renderWeightTab doesn't touch it, but just in case)
+  const dateElAfter = document.getElementById('weight-date');
+  if (dateElAfter && !dateElAfter.value) {
+    dateElAfter.value = date;
+  }
 }
 
 function deleteWeight(date) {
